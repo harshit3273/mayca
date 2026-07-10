@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="description" content="CA Firm Management Platform - Manage GST, ITR, TDS, ROC compliance and client communication" />
+
+    <title>CA Firm Portal</title>
+
+    <!-- Favicon inline SVG as data URI -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text y='68' x='50' text-anchor='middle' font-size='55' font-family='Arial' font-weight='bold' fill='white'>CA</text></svg>" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      /* Prevent flash of unstyled content */
+      #root { min-height: 100vh; }
+
+      /* Initial loading screen shown before React mounts */
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        background: #1e40af;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      #initial-loader .logo-box {
+        width: 72px;
+        height: 72px;
+        background: white;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      }
+      #initial-loader .logo-text {
+        font-family: 'Inter', Arial, sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: #2563eb;
+        letter-spacing: -1px;
+      }
+      #initial-loader h1 {
+        font-family: 'Inter', Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: white;
+        margin: 0 0 8px;
+      }
+      #initial-loader p {
+        font-family: 'Inter', Arial, sans-serif;
+        font-size: 14px;
+        color: rgba(255,255,255,0.7);
+        margin: 0 0 32px;
+      }
+      #initial-loader .spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Loading screen (hidden once React loads) -->
+    <div id="initial-loader">
+      <div class="logo-box">
+        <span class="logo-text">CA</span>
+      </div>
+      <h1>CA Firm Portal</h1>
+      <p>GST · ITR · TDS · ROC Compliance</p>
+      <div class="spinner"></div>
+    </div>
+
+    <div id="root"></div>
+
+    <script>
+      // Hide loader once React app mounts
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var loader = document.getElementById('initial-loader');
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(function () { loader.remove(); }, 300);
+          }
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

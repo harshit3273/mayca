@@ -1,0 +1,11 @@
+{
+  "name": "ca-firm-management-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:backend": "npm start --prefix backend",
+    "dev:backend": "npm run dev --prefix backend",
+    "start:frontend": "npm start --prefix frontend",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
+  }
+}
