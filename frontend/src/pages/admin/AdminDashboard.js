@@ -16,6 +16,8 @@ const AdminDashboard = () => {
   const [showCAForm, setShowCAForm] = useState(false);
   const [caForm, setCaForm] = useState({ name: '', email: '', password: '', phone: '' });
   const [creatingCA, setCreatingCA] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedCA, setExpandedCA] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -154,7 +156,7 @@ const AdminDashboard = () => {
                       <div className="flex gap-2">
                         <select id={`select-unassigned-${client._id}`} defaultValue="unassigned" className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-red-400">
                           <option value="unassigned" disabled>Assign to...</option>
-                          {cas.map(ca => <option key={ca._id} value={ca._id}>{ca.name}</option>)}
+                          {cas.map(ca => <option key={ca._id} value={ca._id} disabled={ca.isActive === false}>{ca.name} {ca.isActive === false ? '(Disabled)' : ''}</option>)}
                         </select>
                         <button onClick={() => handleAssign(client._id, document.getElementById(`select-unassigned-${client._id}`).value)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
                           Assign
@@ -184,9 +186,24 @@ const AdminDashboard = () => {
                       </div>
                       <p className="text-xs text-gray-500">{ca.email}</p>
                       <div className="flex gap-4 mt-1">
-                        <p className="text-xs font-medium text-indigo-600">Managing {ca.clientCount || 0} clients</p>
+                        <p className="text-xs font-medium text-indigo-600 cursor-pointer hover:underline" onClick={() => setExpandedCA(expandedCA === ca._id ? null : ca._id)}>
+                          Managing {ca.clientCount || 0} clients
+                        </p>
                         <p className="text-xs font-medium text-emerald-600">Completed {ca.completedWork || 0} filings</p>
                       </div>
+                      {expandedCA === ca._id && (
+                        <div className="mt-2 pl-2 border-l-2 border-indigo-100 space-y-1">
+                          {allClients.filter(c => c.assignedCA?._id === ca._id).map(c => (
+                            <div key={c._id} className="text-xs text-gray-600 flex justify-between pr-2">
+                              <span>{c.name}</span>
+                              <span className={c.isActive !== false ? 'text-green-600' : 'text-red-500'}>{c.isActive !== false ? 'Active' : 'Suspended'}</span>
+                            </div>
+                          ))}
+                          {allClients.filter(c => c.assignedCA?._id === ca._id).length === 0 && (
+                            <p className="text-xs text-gray-400 italic">No clients assigned</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <button onClick={() => toggleUserStatus(ca._id)} className={`p-2 rounded-lg transition-colors ${ca.isActive !== false ? 'text-green-500 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-100'}`} title={ca.isActive !== false ? "Deactivate CA" : "Reactivate CA"}>
                       {ca.isActive !== false ? <FaToggleOn className="text-2xl" /> : <FaToggleOff className="text-2xl" />}
@@ -206,8 +223,17 @@ const AdminDashboard = () => {
                   <h3 className="font-bold text-gray-900 text-lg">Master Client Directory</h3>
                   <p className="text-sm text-gray-500 mt-0.5">Manage and reassign all clients across the firm</p>
                 </div>
-                <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
-                  {allClients.length} Total
+                <div className="flex items-center gap-4">
+                  <input
+                    type="text"
+                    placeholder="Search clients..."
+                    className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
+                    {allClients.length} Total
+                  </div>
                 </div>
               </div>
               
@@ -221,7 +247,9 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {allClients.map(client => (
+                    {allClients
+                      .filter(client => client.name.toLowerCase().includes(searchTerm.toLowerCase()) || client.email.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .map(client => (
                       <tr key={client._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <p className={`font-semibold ${client.isActive === false ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{client.name}</p>
@@ -245,13 +273,13 @@ const AdminDashboard = () => {
                               }}
                             >
                               <option value="unassigned">Unassigned</option>
-                              {cas.map(ca => <option key={ca._id} value={ca._id}>{ca.name}</option>)}
+                              {cas.map(ca => <option key={ca._id} value={ca._id} disabled={ca.isActive === false}>{ca.name} {ca.isActive === false ? '(Disabled)' : ''}</option>)}
                             </select>
                           </div>
                         </td>
                       </tr>
                     ))}
-                    {allClients.length === 0 && (
+                    {allClients.filter(client => client.name.toLowerCase().includes(searchTerm.toLowerCase()) || client.email.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
                       <tr><td colSpan="3" className="text-center py-12 text-gray-400">No clients in the system yet.</td></tr>
                     )}
                   </tbody>
