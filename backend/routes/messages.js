@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { protect } = require('../middleware/auth');
 
 // GET /api/messages/:userId - get conversation with a user
@@ -62,6 +63,14 @@ router.post('/', protect, async (req, res) => {
       sender: req.user._id,
       recipient: recipientId,
       content
+    });
+
+    await Notification.create({
+      recipient: recipientId,
+      title: 'New Message',
+      message: `You received a new message from ${req.user.name}.`,
+      type: 'message',
+      relatedClient: req.user.role === 'client' ? req.user._id : recipientId
     });
 
     const populated = await Message.findById(message._id)
