@@ -198,7 +198,7 @@ const ClientDocuments = () => {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(150);
-      doc.text(`Page ${i} of ${pageCount} — CA Firm Portal — Confidential`, 14, doc.internal.pageSize.height - 10);
+      doc.text(`Page ${i} of ${pageCount} — MayCA — Confidential`, 14, doc.internal.pageSize.height - 10);
     }
 
     doc.save(`Compliance_Report_${user.name.replace(/\s+/g, '_')}_${new Date().getFullYear()}.pdf`);

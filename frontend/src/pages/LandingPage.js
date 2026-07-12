@@ -50,7 +50,7 @@ const LandingPage = () => {
                             <FaChartLine className="text-white text-sm" />
                         </div>
                         <span className={`font-bold text-lg ${scrolled ? 'text-gray-900' : 'text-white'}`}>
-                            CA Firm Portal
+                            MayCA
                         </span>
                     </div>
 
@@ -329,7 +329,7 @@ const LandingPage = () => {
                                 <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
                                     <FaChartLine className="text-white text-xs" />
                                 </div>
-                                <span className="text-white font-bold">CA Firm Portal</span>
+                                <span className="text-white font-bold">MayCA</span>
                             </div>
                             <p className="text-sm leading-relaxed">The complete compliance management platform for our clients.</p>
                         </div>
@@ -359,7 +359,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                     <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-sm">© {new Date().getFullYear()} CA Firm Portal. All rights reserved.</p>
+                        <p className="text-sm">© {new Date().getFullYear()} MayCA. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

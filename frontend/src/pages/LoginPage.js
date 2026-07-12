@@ -68,7 +68,7 @@ const LoginPage = () => {
           <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
             <FaChartLine className="text-white text-lg" />
           </div>
-          <span className="text-white font-bold text-xl">CA Firm Portal</span>
+          <span className="text-white font-bold text-xl">MayCA</span>
         </Link>
 
         <div>
@@ -94,7 +94,7 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <p className="text-blue-300 text-sm">© {new Date().getFullYear()} CA Firm Portal. All rights reserved.</p>
+        <p className="text-blue-300 text-sm">© {new Date().getFullYear()} MayCA. All rights reserved.</p>
       </div>
 
       {/* Right panel — form */}
@@ -105,7 +105,7 @@ const LoginPage = () => {
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <FaChartLine className="text-white text-lg" />
             </div>
-            <span className="text-gray-900 font-bold text-xl">CA Firm Portal</span>
+            <span className="text-gray-900 font-bold text-xl">MayCA</span>
           </Link>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">

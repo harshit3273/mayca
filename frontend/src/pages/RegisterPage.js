@@ -64,7 +64,7 @@ const RegisterPage = () => {
           <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
             <FaChartLine className="text-white text-lg" />
           </div>
-          <span className="text-white font-bold text-xl">CA Firm Portal</span>
+          <span className="text-white font-bold text-xl">MayCA</span>
         </Link>
         <div>
           <h1 className="text-4xl font-black text-white leading-tight mb-4">
@@ -85,7 +85,7 @@ const RegisterPage = () => {
             ))}
           </div>
         </div>
-        <p className="text-blue-300 text-sm">© {new Date().getFullYear()} CA Firm Portal.</p>
+        <p className="text-blue-300 text-sm">© {new Date().getFullYear()} MayCA.</p>
       </div>
 
       {/* ── Right form panel ── */}
@@ -97,7 +97,7 @@ const RegisterPage = () => {
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <FaChartLine className="text-white" />
             </div>
-            <span className="text-gray-900 font-bold text-xl">CA Firm Portal</span>
+            <span className="text-gray-900 font-bold text-xl">MayCA</span>
           </Link>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">

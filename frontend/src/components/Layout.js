@@ -66,7 +66,7 @@ const Layout = ({ children, navItems }) => {
             <FaChartLine className="text-white text-sm" />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-gray-900 text-sm">CA Firm Portal</h1>
+            <h1 className="font-bold text-gray-900 text-sm">MayCA</h1>
             <p className="text-xs text-gray-400 capitalize">{user?.role === 'ca' ? 'CA Dashboard' : 'Client Portal'}</p>
           </div>
           <button className="md:hidden p-1 rounded-lg hover:bg-gray-100"
