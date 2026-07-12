@@ -158,7 +158,11 @@ const AdminDashboard = () => {
                           <option value="unassigned" disabled>Assign to...</option>
                           {cas.map(ca => <option key={ca._id} value={ca._id} disabled={ca.isActive === false}>{ca.name} {ca.isActive === false ? '(Disabled)' : ''}</option>)}
                         </select>
-                        <button onClick={() => handleAssign(client._id, document.getElementById(`select-unassigned-${client._id}`).value)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+                        <button onClick={() => {
+                          const val = document.getElementById(`select-unassigned-${client._id}`).value;
+                          if (val === 'unassigned') return toast.error('Please select a CA');
+                          handleAssign(client._id, val);
+                        }} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
                           Assign
                         </button>
                       </div>
