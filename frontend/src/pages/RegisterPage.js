@@ -106,31 +106,6 @@ const RegisterPage = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
-              {/* Role selector */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">I am a</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { value: 'client', label: 'Client', desc: 'I need tax help' },
-                    { value: 'ca', label: 'CA / Staff', desc: 'I manage clients' },
-                  ].map(r => (
-                    <button
-                      key={r.value}
-                      type="button"
-                      onClick={() => setForm(prev => ({ ...prev, role: r.value }))}
-                      className={`p-3 rounded-xl border-2 text-left transition-all ${form.role === r.value
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                    >
-                      <p className={`font-semibold text-sm ${form.role === r.value ? 'text-blue-700' : 'text-gray-900'}`}>
-                        {r.label}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5">{r.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Form fields grid */}
               <div className="grid grid-cols-2 gap-4">
