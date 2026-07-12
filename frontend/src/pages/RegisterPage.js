@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaChartLine, FaEye, FaEyeSlash, FaUser, FaEnvelope, FaLock, FaPhone, FaIdCard, FaBuilding } from 'react-icons/fa';
+import {
+  FaChartLine, FaEye, FaEyeSlash,
+  FaUser, FaEnvelope, FaLock, FaPhone, FaIdCard, FaBuilding
+} from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
 const PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
+// No Field wrapper to avoid any potential React reconciliation issues.
 const RegisterPage = () => {
   const [form, setForm] = useState({
     name: '', email: '', password: '', confirmPassword: '',
@@ -16,6 +20,13 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const handleChange = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
+
+  const handlePAN = (e) => {
+    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    setForm(prev => ({ ...prev, pan: val }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,7 +43,7 @@ const RegisterPage = () => {
     try {
       const user = await register(form);
       toast.success('Account created successfully!');
-      navigate('/client');
+      navigate(user.role === 'ca' ? '/ca' : '/client');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -41,20 +52,13 @@ const RegisterPage = () => {
   };
 
   const inputClass = "w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white transition-colors";
-
-  const Field = ({ icon, label, children }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-      <div className="relative">
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{icon}</span>
-        {children}
-      </div>
-    </div>
-  );
+  const panInvalid = form.pan && !PAN_REGEX.test(form.pan);
+  const panValid = form.pan && PAN_REGEX.test(form.pan);
 
   return (
     <div className="min-h-screen flex">
-      {/* Left branding */}
+
+      {/* ── Left branding panel ── */}
       <div className="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-700 flex-col justify-between p-12">
         <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity w-fit">
           <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
@@ -64,18 +68,18 @@ const RegisterPage = () => {
         </Link>
         <div>
           <h1 className="text-4xl font-black text-white leading-tight mb-4">
-            Welcome to Our<br />Client Portal
+            Join the CA<br />Firm Portal
           </h1>
           <p className="text-blue-200 text-lg mb-8">
-            Register your company to access your secure document vault and track your compliance in real-time.
+            Create your account and get started with compliance management.
           </p>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[
-              '✓ Track GST, TDS, and ROC filings',
-              '✓ Secure Document Uploads',
-              '✓ Direct Communication with CAs',
-              '✓ Automated Compliance Alerts',
-              '✓ Instant Invoice Payments',
+              '✓ Secure JWT-based authentication',
+              '✓ Role-based access control',
+              '✓ Real-time notifications',
+              '✓ Document upload & management',
+              '✓ Compliance deadline tracking',
             ].map(f => (
               <p key={f} className="text-blue-100 text-sm">{f}</p>
             ))}
@@ -84,9 +88,11 @@ const RegisterPage = () => {
         <p className="text-blue-300 text-sm">© {new Date().getFullYear()} CA Firm Portal.</p>
       </div>
 
-      {/* Right form */}
+      {/* ── Right form panel ── */}
       <div className="flex-1 flex items-center justify-center p-6 bg-slate-50 overflow-y-auto">
         <div className="w-full max-w-lg py-6">
+
+          {/* Mobile logo */}
           <Link to="/" className="flex items-center gap-3 mb-6 lg:hidden hover:opacity-80 transition-opacity w-fit">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <FaChartLine className="text-white" />
@@ -98,75 +104,197 @@ const RegisterPage = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-1">Create Account</h2>
             <p className="text-gray-500 text-sm mb-6">Fill in your details to register</p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
+              {/* Role selector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">I am a</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'client', label: 'Client', desc: 'I need tax help' },
+                    { value: 'ca', label: 'CA / Staff', desc: 'I manage clients' },
+                  ].map(r => (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => setForm(prev => ({ ...prev, role: r.value }))}
+                      className={`p-3 rounded-xl border-2 text-left transition-all ${form.role === r.value
+                          ? 'border-blue-600 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                    >
+                      <p className={`font-semibold text-sm ${form.role === r.value ? 'text-blue-700' : 'text-gray-900'}`}>
+                        {r.label}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">{r.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
+              {/* Form fields grid */}
               <div className="grid grid-cols-2 gap-4">
-                <Field icon={<FaUser />} label="Full Name *">
-                  <input type="text" className={inputClass} placeholder="Rajesh Kumar"
-                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-                </Field>
 
-                <Field icon={<FaEnvelope />} label="Email *">
-                  <input type="email" className={inputClass} placeholder="you@example.com"
-                    value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
-                </Field>
+                {/* Full Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name *</label>
+                  <div className="relative">
+                    <FaUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                    <input
+                      type="text"
+                      autoComplete="name"
+                      className={inputClass}
+                      placeholder="Rajesh Kumar"
+                      value={form.name}
+                      onChange={handleChange('name')}
+                      required
+                    />
+                  </div>
+                </div>
 
-                <Field icon={<FaLock />} label="Password *">
-                  <input type={showPass ? 'text' : 'password'} className={`${inputClass} pr-10`} placeholder="Min 6 characters"
-                    value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
-                  <button type="button" onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    {showPass ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </Field>
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                    <input
+                      type="email"
+                      autoComplete="email"
+                      className={inputClass}
+                      placeholder="you@example.com"
+                      value={form.email}
+                      onChange={handleChange('email')}
+                      required
+                    />
+                  </div>
+                </div>
 
-                <Field icon={<FaLock />} label="Confirm Password *">
-                  <input type={showConfirm ? 'text' : 'password'} className={`${inputClass} pr-10 ${form.confirmPassword && form.password !== form.confirmPassword ? 'border-red-400' : ''}`}
-                    placeholder="Repeat password"
-                    value={form.confirmPassword} onChange={e => setForm({ ...form, confirmPassword: e.target.value })} required />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    {showConfirm ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </Field>
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Password *</label>
+                  <div className="relative">
+                    <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      className={`${inputClass} pr-10`}
+                      placeholder="Min 6 characters"
+                      value={form.password}
+                      onChange={handleChange('password')}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(p => !p)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPass ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
 
-                <Field icon={<FaPhone />} label="Phone">
-                  <input type="tel" className={inputClass} placeholder="+91 98765 43210"
-                    value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
-                </Field>
+                {/* Confirm Password */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password *</label>
+                  <div className="relative">
+                    <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                    <input
+                      type={showConfirm ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      className={`${inputClass} pr-10 ${form.confirmPassword && form.password !== form.confirmPassword
+                          ? 'border-red-400 focus:ring-red-400'
+                          : form.confirmPassword && form.password === form.confirmPassword
+                            ? 'border-green-400 focus:ring-green-400'
+                            : ''
+                        }`}
+                      placeholder="Repeat password"
+                      value={form.confirmPassword}
+                      onChange={handleChange('confirmPassword')}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(p => !p)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirm ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                  {form.confirmPassword && form.password !== form.confirmPassword && (
+                    <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                  )}
+                  {form.confirmPassword && form.password === form.confirmPassword && form.confirmPassword.length >= 6 && (
+                    <p className="text-xs text-green-600 mt-1">✓ Passwords match</p>
+                  )}
+                </div>
 
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                  <div className="relative">
+                    <FaPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                    <input
+                      type="tel"
+                      autoComplete="tel"
+                      className={inputClass}
+                      placeholder="+91 98765 43210"
+                      value={form.phone}
+                      onChange={handleChange('phone')}
+                    />
+                  </div>
+                </div>
+
+                {/* PAN — handled manually, not via Field, to show validation below */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">PAN Number</label>
                   <div className="relative">
-                    <FaIdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                    <FaIdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
                     <input
                       type="text"
-                      className={`${inputClass} font-mono uppercase ${form.pan && !PAN_REGEX.test(form.pan) ? 'border-red-400' : form.pan && PAN_REGEX.test(form.pan) ? 'border-green-400' : ''}`}
+                      className={`${inputClass} font-mono tracking-widest ${panInvalid ? 'border-red-400 focus:ring-red-400'
+                          : panValid ? 'border-green-400 focus:ring-green-400'
+                            : ''
+                        }`}
                       placeholder="ABCDE1234F"
                       maxLength={10}
                       value={form.pan}
-                      onChange={e => setForm({ ...form, pan: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
+                      onChange={handlePAN}
                     />
                   </div>
-                  {form.pan && !PAN_REGEX.test(form.pan) && (
-                    <p className="text-xs text-red-500 mt-1">{10 - form.pan.length > 0 ? `${10 - form.pan.length} more character(s) needed` : 'Invalid PAN format'}</p>
+                  {panInvalid && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {10 - form.pan.length > 0
+                        ? `${10 - form.pan.length} more character(s) needed`
+                        : 'Invalid format — e.g. ABCDE1234F'}
+                    </p>
                   )}
-                  {form.pan && PAN_REGEX.test(form.pan) && <p className="text-xs text-green-600 mt-1">✓ Valid PAN</p>}
+                  {panValid && <p className="text-xs text-green-600 mt-1">✓ Valid PAN</p>}
+                  {!form.pan && <p className="text-xs text-gray-400 mt-1">5 letters + 4 digits + 1 letter</p>}
                 </div>
 
-                <Field icon={<FaBuilding />} label="Business Name">
-                  <input type="text" className={inputClass} placeholder="Acme Pvt Ltd"
-                    value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} />
-                </Field>
+                {/* Business Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Business Name</label>
+                  <div className="relative">
+                    <FaBuilding className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                    <input
+                      type="text"
+                      className={inputClass}
+                      placeholder="Acme Pvt Ltd"
+                      value={form.businessName}
+                      onChange={handleChange('businessName')}
+                    />
+                  </div>
+                </div>
+
               </div>
 
-              {form.confirmPassword && form.password !== form.confirmPassword && (
-                <p className="text-xs text-red-500">Passwords do not match</p>
-              )}
-
-              <button type="submit" disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm disabled:opacity-60 mt-2">
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm disabled:opacity-60 mt-2"
+              >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">

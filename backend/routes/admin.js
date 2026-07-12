@@ -49,7 +49,15 @@ router.get('/cas-workload', async (req, res) => {
   try {
     const cas = await User.find({ role: 'ca' }).select('-password').lean();
     for (let ca of cas) {
-      ca.clientCount = await User.countDocuments({ role: 'client', assignedCA: ca._id });
+      const clients = await User.find({ role: 'client', assignedCA: ca._id }).select('_id');
+      ca.clientCount = clients.length;
+      
+      // Calculate completed work (filed GST + filed ITR) for these clients
+      const clientIds = clients.map(c => c._id);
+      const filedGst = await GSTRecord.countDocuments({ client: { $in: clientIds }, status: 'filed' });
+      const filedItr = await ITRRecord.countDocuments({ client: { $in: clientIds }, status: 'filed' });
+      
+      ca.completedWork = filedGst + filedItr;
     }
     res.json(cas);
   } catch (err) {
@@ -81,7 +89,15 @@ router.get('/cas', async (req, res) => {
 router.put('/assign-client/:clientId', async (req, res) => {
   try {
     const { caId } = req.body;
-    if (!caId) return res.status(400).json({ message: 'caId is required' });
+    if (!caId || caId === 'unassigned') {
+      const client = await User.findByIdAndUpdate(
+        req.params.clientId,
+        { $unset: { assignedCA: 1 } },
+        { new: true }
+      ).select('-password');
+      if (!client) return res.status(404).json({ message: 'Client not found' });
+      return res.json(client);
+    }
 
     const ca = await User.findById(caId);
     if (!ca || ca.role !== 'ca') {
@@ -142,10 +158,10 @@ router.put('/toggle-user/:id', async (req, res) => {
     }
     
     // Toggle active status (defaults to true if undefined)
-    user.isActive = user.isActive === undefined ? false : !user.isActive;
-    await user.save();
+    const newState = user.isActive === undefined ? false : !user.isActive;
+    await User.findByIdAndUpdate(user._id, { isActive: newState });
     
-    res.json({ message: 'User status toggled', user: { _id: user._id, isActive: user.isActive } });
+    res.json({ message: 'User status toggled', user: { _id: user._id, isActive: newState } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

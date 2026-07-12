@@ -152,8 +152,8 @@ const AdminDashboard = () => {
                       <p className="font-semibold text-gray-900 text-sm">{client.name}</p>
                       <p className="text-xs text-gray-500 mb-2">{client.email}</p>
                       <div className="flex gap-2">
-                        <select id={`select-unassigned-${client._id}`} defaultValue="" className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-red-400">
-                          <option value="" disabled>Assign to...</option>
+                        <select id={`select-unassigned-${client._id}`} defaultValue="unassigned" className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-red-400">
+                          <option value="unassigned" disabled>Assign to...</option>
                           {cas.map(ca => <option key={ca._id} value={ca._id}>{ca.name}</option>)}
                         </select>
                         <button onClick={() => handleAssign(client._id, document.getElementById(`select-unassigned-${client._id}`).value)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
@@ -183,7 +183,10 @@ const AdminDashboard = () => {
                         {ca.isActive === false && <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold uppercase">Disabled</span>}
                       </div>
                       <p className="text-xs text-gray-500">{ca.email}</p>
-                      <p className="text-xs font-medium text-indigo-600 mt-1">Managing {ca.clientCount || 0} clients</p>
+                      <div className="flex gap-4 mt-1">
+                        <p className="text-xs font-medium text-indigo-600">Managing {ca.clientCount || 0} clients</p>
+                        <p className="text-xs font-medium text-emerald-600">Completed {ca.completedWork || 0} filings</p>
+                      </div>
                     </div>
                     <button onClick={() => toggleUserStatus(ca._id)} className={`p-2 rounded-lg transition-colors ${ca.isActive !== false ? 'text-green-500 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-100'}`} title={ca.isActive !== false ? "Deactivate CA" : "Reactivate CA"}>
                       {ca.isActive !== false ? <FaToggleOn className="text-2xl" /> : <FaToggleOff className="text-2xl" />}
@@ -233,15 +236,15 @@ const AdminDashboard = () => {
                           <div className="flex items-center gap-2">
                             <select 
                               id={`select-reassign-${client._id}`}
-                              defaultValue={client.assignedCA?._id || ""}
+                              defaultValue={client.assignedCA?._id || "unassigned"}
                               className="w-40 border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white focus:ring-2 focus:ring-indigo-500"
                               onChange={(e) => {
-                                if(e.target.value !== (client.assignedCA?._id || "")) {
+                                if(e.target.value !== (client.assignedCA?._id || "unassigned")) {
                                   handleAssign(client._id, e.target.value);
                                 }
                               }}
                             >
-                              <option value="" disabled>Unassigned</option>
+                              <option value="unassigned">Unassigned</option>
                               {cas.map(ca => <option key={ca._id} value={ca._id}>{ca.name}</option>)}
                             </select>
                           </div>

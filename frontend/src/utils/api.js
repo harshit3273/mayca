@@ -6,7 +6,7 @@ const API = axios.create({
 
 // Attach JWT to every request
 API.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem('ca_user') || 'null');
+  const user = JSON.parse(sessionStorage.getItem('ca_user') || 'null');
   if (user && user.token) {
     config.headers.Authorization = `Bearer ${user.token}`;
   }
@@ -20,7 +20,7 @@ API.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Don't redirect if we are already on the auth pages (login/register)
       if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-        localStorage.removeItem('ca_user');
+        sessionStorage.removeItem('ca_user');
         window.location.href = '/login';
       }
     }

@@ -13,7 +13,7 @@ const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,18 +36,14 @@ const LoginPage = () => {
       // Strict tab enforcement
       if (activeTab === 'client' && (user.role === 'ca' || user.role === 'admin')) {
           toast.error("Invalid login. Staff must use the CA Login tab.");
-          // To cleanly handle this, we ideally shouldn't have set the token in AuthContext, 
-          // but since login() already did, we could force a logout or just redirect them anyway.
-          // Better yet, just enforce it by warning them and logging them out (requires window.location.reload or calling a logout function).
-          // For now, let's just show an error.
-          localStorage.removeItem('token'); // Hacky force logout since we don't have logout() in scope
+          logout();
           setLoading(false);
           return;
       }
       
       if (activeTab === 'ca' && user.role === 'client') {
           toast.error("Invalid login. Clients must use the Client Login tab.");
-          localStorage.removeItem('token');
+          logout();
           setLoading(false);
           return;
       }
