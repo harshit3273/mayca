@@ -46,7 +46,7 @@ const AdminDashboard = () => {
     if (!caId) return toast.error('Please select a CA');
     try {
       await API.put(`/admin/assign-client/${clientId}`, { caId });
-      toast.success('Client assigned successfully');
+      toast.success(caId === 'unassigned' ? 'Client unassigned successfully' : 'Client assigned successfully');
       fetchData(); // Refresh all tables
     } catch (err) {
       toast.error(err.response?.data?.message || 'Assignment failed');
