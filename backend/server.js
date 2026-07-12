@@ -9,6 +9,7 @@ const path = require('path');
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Middleware
 const allowedOrigins = ['http://localhost:3000', process.env.FRONTEND_URL];
